@@ -6,7 +6,7 @@
     Tests the Flaskr application.
 """
 import os
-import __init__
+import flaskr
 import unittest
 import tempfile
 
@@ -15,15 +15,15 @@ class FlaskrTestCase(unittest.TestCase):
 
     def setUp(self):
         """Before each test, set up a blank database"""
-        self.db_fd, __init__.app.config['DATABASE'] = tempfile.mkstemp()
-        __init__.app.config['TESTING'] = True
-        self.app = __init__.app.test_client()
-        __init__.init_db()
+        self.db_fd, flaskr.app.config['DATABASE'] = tempfile.mkstemp()
+        flaskr.app.config['TESTING'] = True
+        self.app = flaskr.app.test_client()
+        flaskr.init_db()
 
     def tearDown(self):
         """Get rid of the database again after each test."""
         os.close(self.db_fd)
-        os.unlink(__init__.app.config['DATABASE'])
+        os.unlink(flaskr.app.config['DATABASE'])
 
     def login(self, username, password):
         return self.app.post('/login', data=dict(
@@ -43,22 +43,22 @@ class FlaskrTestCase(unittest.TestCase):
 
     def test_login_logout(self):
         """Make sure login and logout works"""
-        rv = self.login(__init__.app.config['USERNAME'],
-                        __init__.app.config['PASSWORD'])
+        rv = self.login(flaskr.app.config['USERNAME'],
+                        flaskr.app.config['PASSWORD'])
         assert 'You were logged in' in rv.data
         rv = self.logout()
         assert 'You were logged out' in rv.data
-        rv = self.login(__init__.app.config['USERNAME'] + 'x',
-                        __init__.app.config['PASSWORD'])
+        rv = self.login(flaskr.app.config['USERNAME'] + 'x',
+                        flaskr.app.config['PASSWORD'])
         assert 'Invalid username' in rv.data
-        rv = self.login(__init__.app.config['USERNAME'],
-                        __init__.app.config['PASSWORD'] + 'x')
+        rv = self.login(flaskr.app.config['USERNAME'],
+                        flaskr.app.config['PASSWORD'] + 'x')
         assert 'Invalid password' in rv.data
 
     def test_messages(self):
         """Test that messages work"""
-        self.login(__init__.app.config['USERNAME'],
-                   __init__.app.config['PASSWORD'])
+        self.login(flaskr.app.config['USERNAME'],
+                   flaskr.app.config['PASSWORD'])
         rv = self.app.post('/add', data=dict(
             title='<Hello>',
             text='<strong>HTML</strong> allowed here'
